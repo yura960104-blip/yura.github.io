@@ -1,1 +1,34 @@
-# yura.github.io
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>고강민에게</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      font-family: Arial, sans-serif;
+    }
+    .message {
+      text-align: center;
+      font-size: 32px;
+      color: white;
+      font-weight: bold;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="message">
+    고마돌 사랑해 ❤️<br>
+    화해하자<br>
+    미안해<br>
+    점심 맛있게 먹구 오늘하루도 힘내쟈!!<br>
+    - 율탱크가 -
+  </div>
+</body>
+</html># yura.github.io
