@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>고마돌에게❤️</title>
+  <title>유라의 메시지</title>
   <style>
     body {
       margin: 0;
@@ -10,25 +10,105 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-      font-family: Arial, sans-serif;
-    }
-    .message {
       text-align: center;
-      font-size: 32px;
+      font-family: 'Arial', sans-serif;
       color: white;
-      font-weight: bold;
-      line-height: 1.6;
+      overflow: hidden;
     }
+
+    /* 배경 그라데이션 애니메이션 */
+    .background {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #ffdde1, #fcb69f);
+      background-size: 400% 400%;
+      animation: gradientMove 10s ease infinite;
+      z-index: -2;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* 캐릭터 */
+    .characters {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      opacity: 0.4;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .characters img {
+      width: 180px;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    /* 하트 애니메이션 */
+    .heart {
+      position: absolute;
+      font-size: 30px;
+      animation: heartBeat 1.2s infinite;
+    }
+
+    @keyframes heartBeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+
+    /* 텍스트 */
+    .message {
+      font-size: 42px;
+      font-weight: bold;
+      line-height: 1.5;
+      text-shadow: 2px 2px 15px rgba(0,0,0,0.4);
+      opacity: 0;
+      animation: fadeIn 2s ease forwards;
+      animation-delay: 1s;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
   </style>
 </head>
 <body>
-  <div class="message">
-    고마돌 사랑해 ❤️<br>
-    나랑 화해하자<br>
-    내 자존심만 생각해서 미안해<br>
-    오늘하루도 힘내쟈!!<br>
-    - 율탱크가 -
+
+  <div class="background"></div>
+
+  <!-- 하트 -->
+  <div class="heart" style="top:20%; left:45%;">❤️</div>
+
+  <!-- 캐릭터 -->
+  <div class="characters">
+    <img src="komadol.png" alt="꼬마돌">
+    <img src="miltank.png" alt="밀탱크">
   </div>
+
+  <!-- 메시지 -->
+  <div class="message">
+    고마돌 사랑해❤️ <br>
+    내가 무턱대고 내 감정만 밑어붙인거 진심으로 사과할게!<br>
+    -유라가-
+  </div>
+
 </body>
 </html>
