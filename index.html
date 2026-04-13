@@ -1,138 +1,185 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  
-  <!-- ⭐ 이거 없으면 모바일 깨짐 (핵심) -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>유라의 메시지</title>
-
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      font-family: 'Arial', sans-serif;
-      color: white;
-      overflow: hidden;
-    }
-
-    /* 배경 */
-    .background {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #ffdde1, #fcb69f);
-      background-size: 400% 400%;
-      animation: gradientMove 10s ease infinite;
-      z-index: -2;
-    }
-
-    @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* 캐릭터 */
-    .characters {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      opacity: 0.4;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    .characters img {
-      width: 70%;
-      max-width: 400px;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-15px); }
-    }
-
-    /* 하트 */
-    .heart {
-      position: absolute;
-      font-size: 24px;
-      animation: heartBeat 1.2s infinite;
-      top: 15%;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    @keyframes heartBeat {
-      0%, 100% { transform: translateX(-50%) scale(1); }
-      50% { transform: translateX(-50%) scale(1.3); }
-    }
-
-    /* 메시지 */
-    .message {
-      padding: 0 20px;
-      font-size: 28px;
-      font-weight: bold;
-      line-height: 1.6;
-      text-shadow: 2px 2px 15px rgba(0,0,0,0.4);
-      opacity: 0;
-      animation: fadeIn 2s ease forwards;
-      animation-delay: 1s;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* ⭐ 모바일 대응 (핵심) */
-    @media (max-width: 480px) {
-      .message {
-        font-size: 22px;
-      }
-
-      .characters img {
-        width: 85%;
-      }
-
-      .heart {
-        font-size: 20px;
-      }
-    }
-
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>강민 왕자의 유라 공주 찾기 대모험</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+        body { margin: 0; background: #5c94fa; display: flex; flex-direction: column; align-items: center; font-family: 'Jua', sans-serif; overflow: hidden; touch-action: none; height: 100vh; color: white; }
+        .game-title { text-shadow: 4px 4px 0 #000; font-size: 26px; margin: 15px 0; letter-spacing: -1px; }
+        .container { position: relative; border: 6px solid #fff; border-radius: 15px; width: 95vw; max-width: 800px; aspect-ratio: 2/1; overflow: hidden; background: #5c94fa; box-shadow: 0 15px 50px rgba(0,0,0,0.6); }
+        canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+        .controls-area { width: 100%; max-width: 800px; display: flex; justify-content: space-around; padding: 20px 0; }
+        .ctrl-btn { width: 100px; height: 100px; border-radius: 50%; border: 5px solid #fff; display: flex; justify-content: center; align-items: center; font-size: 22px; box-shadow: 0 8px 0 rgba(0,0,0,0.3); transition: 0.1s; color: #000; font-weight: bold; cursor: pointer; }
+        .jump-btn { background: #ffeb3b; }
+        .slide-btn { background: #4fc3f7; }
+        .ctrl-btn:active { transform: translateY(6px); box-shadow: none; }
+        #overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; display: flex; justify-content: center; align-items: center; }
+        #startScreen { background: rgba(92, 148, 250, 0.9); width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        #ending { display: none; background: rgba(0, 0, 0, 0.85); width: 100%; height: 100%; flex-direction: column; justify-content: center; align-items: center; }
+        .play-btn { padding: 15px 50px; font-size: 30px; border-radius: 50px; border: 4px solid #000; background: #ffeb3b; font-family: 'Jua', sans-serif; box-shadow: 0 6px 0 #c6a700; cursor: pointer; }
+    </style>
 </head>
-
 <body>
+    <div class="game-title">👑 강민 왕자의 유라 공주 찾기 대모험 👑</div>
+    <div class="container">
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        <div id="overlay">
+            <div id="startScreen">
+                <h1 style="font-size: 42px; text-shadow: 4px 4px 0 #000; margin-bottom: 30px;">공주님을 구하러 갈까요?</h1>
+                <button class="play-btn" onclick="startGame()">START!</button>
+            </div>
+            <div id="ending">
+                <h2 style="font-size: 40px; color: #ffeb3b; margin-bottom: 20px;">🌻 미션 대성공 🌻</h2>
+                <p style="font-size: 24px; margin-bottom: 30px;">강민 왕자가 유라 공주를 만났습니다!</p>
+                <button class="play-btn" onclick="location.reload()">다시 하기</button>
+            </div>
+        </div>
+    </div>
+    <div class="controls-area">
+        <div class="ctrl-btn slide-btn" id="btnSlide">슬라이딩</div>
+        <div class="ctrl-btn jump-btn" id="btnJump">점프</div>
+    </div>
 
-  <div class="background"></div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const startScreen = document.getElementById('startScreen');
+        const ending = document.getElementById('ending');
 
-  <!-- 하트 -->
-  <div class="heart">❤️</div>
+        let state = { speed: 7, coins: 0, isBooster: false, boosterTimer: 0, distance: 0, active: false, frame: 0 };
+        const player = { x: 120, y: 270, dy: 0, jumpForce: 16, gravity: 0.9, isSliding: false };
+        let obstacles = [], coinItems = [], deco = { clouds: [], hills: [], flowers: [] };
 
-  <!-- 캐릭터 -->
-  <div class="characters">
-    <img src="hello.png" alt="꼬마돌 밀탱크">
-  </div>
+        function dRect(x, y, w, h, color) { ctx.fillStyle = color; ctx.fillRect(Math.round(x), Math.round(y), w, h); }
 
-  <!-- 메시지 -->
-  <div class="message">
-    고마돌 사랑해❤️ <br>
-    내가 무턱대고 내 감정만 밀어붙인 거 진심으로 사과할게.<br>
-    -유라가-
-  </div>
+        function drawKangmin() {
+            ctx.save();
+            let p = player, py = p.isSliding ? p.y+40 : p.y;
+            let walkCycle = Math.sin(state.frame * 0.2) * 5; // 걷기 애니메이션
+            
+            if (state.isBooster) ctx.filter = `hue-rotate(${state.frame*20}deg) brightness(1.3)`;
+            
+            // 다리 애니메이션
+            if(!p.isSliding && p.y >= 270) {
+                dRect(p.x+15, py+70, 10, 10 + walkCycle, "#212121");
+                dRect(p.x+35, py+70, 10, 10 - walkCycle, "#212121");
+            }
 
+            // 몸 (데님 베스트 + 후드)
+            dRect(p.x+8, py+30, 44, 45, "#1a237e"); // 후드
+            dRect(p.x+10, py+35, 40, 35, "#3949ab"); // 데님
+            dRect(p.x+24, py+35, 12, 35, "#1a237e"); // 후드 가슴부분
+            
+            // 팔 애니메이션
+            if(!p.isSliding) dRect(p.x-5+walkCycle, py+40, 15, 15, "#ffdbac");
+
+            // 얼굴/헤어 (사진 반영)
+            dRect(p.x+16, py, 32, 34, "#ffdbac"); 
+            dRect(p.x+14, py-2, 36, 15, "#2d1b00"); // 덮은 머리 스타일
+            dRect(p.x+22, py+18, 6, 6, "#000"); dRect(p.x+36, py+18, 6, 6, "#000"); 
+            ctx.restore();
+        }
+
+        function drawYura(x, y) {
+            let bob = Math.sin(state.frame * 0.1) * 3; // 공주님 둥실둥실 애니메이션
+            dRect(x+8, y+30+bob, 44, 50, "#1b5e20"); // 초록 가디건
+            dRect(x+8, y+45+bob, 44, 4, "#ffffff"); // 가디건 흰 줄무늬
+            dRect(x+16, y+bob, 32, 34, "#ffdbac"); 
+            dRect(x+12, y-2+bob, 40, 40, "#4e342e"); // 긴 머리
+            dRect(x+18, y+6+bob, 28, 10, "#212121"); // 선글라스 디테일
+            dRect(x+25, y+24+bob, 14, 4, "#f06292"); // 핑크 립
+        }
+
+        function drawFlower(x, y) {
+            let sway = Math.sin(state.frame * 0.05 + x) * 2; // 꽃 살랑거림
+            dRect(x+8+sway, y+10, 4, 20, "#4caf50");
+            dRect(x+sway, y, 20, 15, "#fdd835"); // 수선화 노란잎
+            dRect(x+6+sway, y+4, 8, 7, "#fb8c00"); 
+        }
+
+        function init() {
+            for(let i=0; i<5; i++) deco.hills.push({x: i*250, y: 180, c: i%2?'#4caf50':'#81c784'});
+            for(let i=0; i<15; i++) deco.flowers.push({x: i*100, y: 325});
+            for(let i=0; i<4; i++) deco.clouds.push({x: Math.random()*800, y: 30+Math.random()*60, s: 0.8+Math.random()});
+        }
+
+        function startGame() { state.active = true; startScreen.style.display = 'none'; }
+        function handleJump() { if (player.y >= 270 && !player.isSliding) player.dy = -player.jumpForce; }
+        function handleSlide() { if (player.y >= 270 && !player.isSliding) { player.isSliding = true; player.slideTimer = 50; } }
+
+        function update() {
+            if (!state.active) return;
+            state.frame++;
+            state.distance += state.speed;
+            player.dy += player.gravity;
+            player.y += player.dy;
+            if (player.y > 270) { player.y = 270; player.dy = 0; }
+            if (player.isSliding) { player.slideTimer--; if (player.slideTimer <= 0) player.isSliding = false; }
+            
+            if (state.frame % 80 === 0) obstacles.push({ x: 850, y: Math.random() > 0.5 ? 240 : 315 });
+            if (state.frame % 50 === 0) coinItems.push({ x: 850, y: 160 + Math.random()*120 });
+            
+            obstacles.forEach((o, i) => {
+                o.x -= state.speed;
+                if (!state.isBooster && player.x < o.x + 35 && player.x + 40 > o.x && (player.isSliding?player.y+40:player.y) < 350 && player.y+80 > o.y) {
+                    state.active = false; alert("앗! 장애물!"); location.reload();
+                }
+            });
+            coinItems.forEach((c, i) => {
+                c.x -= state.speed;
+                if (player.x < c.x+30 && player.x+40 > c.x && player.y < c.y+30 && player.y+80 > c.y) {
+                    state.coins++; coinItems.splice(i, 1);
+                    if (state.coins >= 15) { state.isBooster = true; state.boosterTimer = 180; state.coins = 0; }
+                }
+            });
+            if (state.isBooster) { state.boosterTimer--; if(state.boosterTimer <= 0) state.isBooster = false; }
+            if (state.distance > 6000) { state.active = false; ending.style.display = 'flex'; }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // 배경
+            deco.hills.forEach(h => {
+                if(state.active) h.x -= state.speed*0.2; if(h.x < -300) h.x = 950;
+                ctx.fillStyle = h.c; ctx.beginPath(); ctx.arc(h.x, h.y+170, 180, 0, Math.PI*2); ctx.fill();
+            });
+            deco.clouds.forEach(c => {
+                if(state.active) c.x -= state.speed*0.1; if(c.x < -150) c.x = 850;
+                ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(c.x, c.y, 25*c.s, 0, Math.PI*2); ctx.arc(c.x+20, c.y-10, 20*c.s, 0, Math.PI*2); ctx.fill();
+            });
+            deco.flowers.forEach(f => {
+                if(state.active) f.x -= state.speed; if(f.x < -100) f.x = 900;
+                drawFlower(f.x, f.y);
+            });
+            
+            // 땅
+            dRect(0, 350, 800, 50, "#8d6e63"); dRect(0, 350, 800, 12, "#4caf50");
+            
+            obstacles.forEach(o => { 
+                dRect(o.x, o.y, 40, 40, "#5d4037"); // 몬스터
+                dRect(o.x+10, o.y+10, 6, 10, "#fff"); dRect(o.x+24, o.y+10, 6, 10, "#fff");
+            });
+            coinItems.forEach(c => { 
+                ctx.fillStyle = "#ffeb3b"; ctx.beginPath(); ctx.arc(c.x, c.y, 14, 0, Math.PI*2); ctx.fill();
+                dRect(c.x-2, c.y-8, 4, 16, "#fbc02d");
+            });
+
+            drawKangmin();
+            if (state.distance > 5500) drawYura(650, 270);
+            
+            // UI
+            ctx.fillStyle = "rgba(0,0,0,0.4)"; dRect(20, 20, 160, 40, "rgba(0,0,0,0.4)");
+            ctx.fillStyle = "white"; ctx.font = "22px Jua"; ctx.fillText(`🌻 코인: ${state.coins}/15`, 35, 48);
+            if(state.isBooster) { ctx.fillStyle = "yellow"; ctx.fillText("🔥 무적 질주!!", 320, 48); }
+        }
+
+        document.getElementById('btnJump').addEventListener('touchstart', (e) => { e.preventDefault(); handleJump(); });
+        document.getElementById('btnSlide').addEventListener('touchstart', (e) => { e.preventDefault(); handleSlide(); });
+        init();
+        function loop() { update(); draw(); requestAnimationFrame(loop); }
+        loop();
+    </script>
 </body>
 </html>
